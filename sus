@@ -1,0 +1,38 @@
+-- 飞跃脚本示例
+local UIS = game:GetService("UserInputService")
+local flying = false -- 飞行状态标志
+
+-- 开启或关闭飞行状态的函数
+local function toggleFly()
+    flying = not flying
+    local character = game.Players.LocalPlayer.Character
+    if not character then return end
+
+    if flying then
+        -- 如果在飞行状态，设置重力为0
+        character.HumanoidRootPart.BodyForce = Instance.new("BodyForce")
+        character.HumanoidRootPart.BodyForce.Force = Vector3.new(0, character.HumanoidRootPart.BodyForce.Force.Y - character.HumanoidRootPart.BodyForce.Force.Y, 0)
+    else
+        -- 如果不在飞行状态，移除重力设置
+        if character.HumanoidRootPart:FindFirstChild("BodyForce") then
+            character.HumanoidRootPart.BodyForce:Destroy()
+        end
+    end
+end
+
+-- 监听按键事件来开启或关闭飞行状态
+UIS.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.Space then
+        toggleFly()
+    end
+end)
+
+-- 当飞行状态开启时，允许玩家上升
+game:GetService("RunService").Heartbeat:Connect(function()
+    if flying then
+        local character = game.Players.LocalPlayer.Character
+        if not character then return end
+        character.HumanoidRootPart.Velocity = Vector3.new(0, 50, 0) -- 设置上升速度
+    end
+end)
