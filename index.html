@@ -12,58 +12,48 @@
   <div id="sentence">这里会显示一段话</div>
   <input type="text" id="input-field" placeholder="在这里输入句子..." />
   <p>用时: <span id="time">0</span> 秒</p>
-  <button id="next-sentence">下一句</button>
 </div>
 
 <script>
   const sentences = [
-    "猫咪在阳光下打盹。",
-    "快速的棕色狐狸跳过懒狗。",
-    "打字游戏可以提高打字速度。",
-    "我从一堆石头里找到了一只红薯",
-    "怎么的这玩意你要买给你同学来我这必须一次性给你干报废",
-    "刀哥你头上长草了",
-    "zhr你内裤什么颜色",
-    
+    "猫咪在阳光下打盹，而孩子们在公园里追逐嬉戏。",
+    "The quick brown fox jumps over the lazy dog.",
+    "打字游戏可以提高打字速度，也是一种很好的大脑锻炼方式。",
+    "Learning to type quickly and accurately is an essential skill in the digital age.",
     // ...更多句子...
   ];
-  let currentSentenceIndex = 0;
+  let currentSentenceIndex;
   let startTime;
   let endTime;
 
-  // 更新句子显示
+  // 随机选择一句话并更新显示
   function updateSentence() {
+    currentSentenceIndex = Math.floor(Math.random() * sentences.length);
     document.getElementById('sentence').textContent = sentences[currentSentenceIndex];
     document.getElementById('input-field').value = '';
     startTime = new Date().getTime();
   }
 
   // 检查输入的句子是否正确
-  function checkInput() {
+  function checkInput(event) {
     const inputField = document.getElementById('input-field');
-    if (inputField.value === sentences[currentSentenceIndex]) {
+    if (inputField.value === sentences[currentSentenceIndex] && event.key === 'Enter') {
       endTime = new Date().getTime();
       calculateTime();
+      updateSentence();
     }
   }
 
   // 计算完成句子所用的时间
   function calculateTime() {
     const timeTaken = (endTime - startTime) / 1000;
-    document.getElementById('time').textContent = timeTaken;
+    document.getElementById('time').textContent = timeTaken.toFixed(2);
   }
 
   // 初始化游戏
   function initGame() {
     updateSentence();
-    document.getElementById('input-field').addEventListener('input', checkInput);
-    document.getElementById('next-sentence').addEventListener('click', function() {
-      currentSentenceIndex++;
-      if (currentSentenceIndex >= sentences.length) {
-        currentSentenceIndex = 0; // 或者可以结束游戏
-      }
-      updateSentence();
-    });
+    document.getElementById('input-field').addEventListener('keypress', checkInput);
   }
 
   initGame();
