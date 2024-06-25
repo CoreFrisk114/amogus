@@ -1,38 +1,78 @@
--- 飞跃脚本示例
-local UIS = game:GetService("UserInputService")
-local flying = false -- 飞行状态标志
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>打字游戏</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f7f7f7;
+  }
+  #game-container {
+    width: 800px;
+    text-align: center;
+  }
+  #word {
+    font-size: 24px;
+    margin: 20px;
+  }
+  #input-field {
+    width: 300px;
+    padding: 10px;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="word">这里会显示单词</div>
+  <input type="text" id="input-field" placeholder="在这里输入单词..." />
+  <p>打字速度: <span id="speed">0</span> 字/分钟</p>
+</div>
 
--- 开启或关闭飞行状态的函数
-local function toggleFly()
-    flying = not flying
-    local character = game.Players.LocalPlayer.Character
-    if not character then return end
+<script>
+  const words = ["键盘", "打字", "游戏", "速度", "练习"];
+  let currentWordIndex = 0;
+  let startTime = new Date().getTime();
 
-    if flying then
-        -- 如果在飞行状态，设置重力为0
-        character.HumanoidRootPart.BodyForce = Instance.new("BodyForce")
-        character.HumanoidRootPart.BodyForce.Force = Vector3.new(0, character.HumanoidRootPart.BodyForce.Force.Y - character.HumanoidRootPart.BodyForce.Force.Y, 0)
-    else
-        -- 如果不在飞行状态，移除重力设置
-        if character.HumanoidRootPart:FindFirstChild("BodyForce") then
-            character.HumanoidRootPart.BodyForce:Destroy()
-        end
-    end
-end
+  // 更新单词显示
+  function updateWord() {
+    document.getElementById('word').textContent = words[currentWordIndex];
+  }
 
--- 监听按键事件来开启或关闭飞行状态
-UIS.InputBegan:Connect(function(input, gameProcessedEvent)
-    if gameProcessedEvent then return end
-    if input.KeyCode == Enum.KeyCode.Space then
-        toggleFly()
-    end
-end)
+  // 检查输入的单词是否正确
+  function checkInput() {
+    const inputField = document.getElementById('input-field');
+    if (inputField.value === words[currentWordIndex]) {
+      currentWordIndex++;
+      if (currentWordIndex >= words.length) {
+        currentWordIndex = 0;
+      }
+      updateWord();
+      inputField.value = '';
+      calculateSpeed();
+    }
+  }
 
--- 当飞行状态开启时，允许玩家上升
-game:GetService("RunService").Heartbeat:Connect(function()
-    if flying then
-        local character = game.Players.LocalPlayer.Character
-        if not character then return end
-        character.HumanoidRootPart.Velocity = Vector3.new(0, 50, 0) -- 设置上升速度
-    end
-end)
+  // 计算打字速度
+  function calculateSpeed() {
+    const currentTime = new Date().getTime();
+    const timeDiff = currentTime - startTime;
+    const speed = Math.round((currentWordIndex / (timeDiff / 60000)) * 100) / 100;
+    document.getElementById('speed').textContent = speed;
+  }
+
+  // 初始化游戏
+  function initGame() {
+    updateWord();
+    document.getElementById('input-field').addEventListener('input', checkInput);
+  }
+
+  initGame();
+</script>
+</body>
+</html>
